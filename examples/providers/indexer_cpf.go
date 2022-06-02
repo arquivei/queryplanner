@@ -9,11 +9,15 @@ import (
 
 // An indexer is a special type of provider.
 // It must initialize the documents that will be enriched, being the first query to be made.
-type CPFIndexer struct{}
+type CPFIndexer struct {
+	db []string
+}
 
 // NewCovidDatabaseProvider You can use a constructor to pass in the dependencies to your provider, such as database connections.
-func NewCPFIndexer() queryplanner.IndexProvider {
-	return &CPFIndexer{}
+func NewCPFIndexer(indexerDB []string) queryplanner.IndexProvider {
+	return &CPFIndexer{
+		db: indexerDB,
+	}
 }
 
 // Provides return an []queryplanner.Index.
@@ -39,14 +43,22 @@ func (p *CPFIndexer) Provides() []queryplanner.Index {
 // The request param can be a struct that might carry needed information for your service, such as pagination, filters, etc.
 func (p *CPFIndexer) Execute(ctx context.Context, request queryplanner.Request, fields []string) (*queryplanner.Payload, error) {
 	fmt.Println("CPFIndexer being executed")
+
+	req, ok := request.(*Request)
+	if !ok {
+		return nil, fmt.Errorf("error bad request")
+	}
+
+	docs := []queryplanner.Document{}
+	for _, cpf := range p.db {
+		docs = append(docs, &Person{
+			CPF: ref(cpf),
+		})
+		if req.Limit > 0 && req.Limit == len(docs) { // Limits the ammount of documents that is returned based on the request's limit
+			break
+		}
+	}
 	return &queryplanner.Payload{
-		Documents: []queryplanner.Document{
-			&Person{
-				CPF: ref("44452427138"),
-			},
-			&Person{
-				CPF: ref("85022625806"),
-			},
-		},
+		Documents: docs,
 	}, nil
 }

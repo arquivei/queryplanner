@@ -32,7 +32,7 @@ func (p *CovidDatabaseProvider) Provides() []queryplanner.Field {
 				fmt.Println("CovidDatabaseProvider being executed")
 				doc, ok := ec.Payload.Documents[i].(*Person) // Cast to a pointer so we can change the underlying struct
 				if !ok {
-					return fmt.Errorf("Error casting document to person struct.")
+					return fmt.Errorf("error casting document to person struct")
 				}
 				hadCovid, ok := p.covidRepository[*doc.CPF] // Note that the CPF is needed to query the covid database.
 				if ok {
