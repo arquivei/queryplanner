@@ -9,10 +9,6 @@ import (
 	"github.com/arquivei/queryplanner/examples/providers"
 )
 
-/*
-	- Utilizar _ em uma das dependências. (Criar provider que modifica formato do cpf)
-*/
-
 // Represents the mock of the covid database
 var covidDatabase = map[string]bool{
 	"44452427138": true,
@@ -45,6 +41,8 @@ func main() {
 	// Check providers/govDatabase.go for explanation on FieldProviders.
 	govDatabase := providers.NewGovDatabaseProvider(govDatabase)
 	covidDatabase := providers.NewCovidDatabaseProvider(covidDatabase)
+
+	// A provider that only calculates fields. Not all providers are gateways to services/databases.
 	cpfFormatter := &providers.CPFFormatterProvider{}
 
 	// QueryPlanner takes an IndexerProvider and multiple FieldProviders.
