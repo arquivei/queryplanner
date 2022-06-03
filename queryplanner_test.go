@@ -19,7 +19,7 @@ func TestQueryPlan_New(t *testing.T) {
 		expectedNewError                   string
 	}{
 		{
-			name:      "[Success] empty - no IndexProviders",
+			name:      "[Success] empty - no Field providers",
 			providers: []*fieldProviderMock{},
 			indexProvider: &indexProviderMock{
 				provides: []Index{
@@ -41,6 +41,96 @@ func TestQueryPlan_New(t *testing.T) {
 			request:                            &requestMock{[]string{"a", "b", "c"}},
 			expectedFieldsToBeFetchedFromIndex: []string{"a", "b", "c"},
 			expectedNewError:                   "",
+		},
+		{
+			name: "[Success] With field providers",
+			providers: []*fieldProviderMock{
+				{
+					name:      "b-provider",
+					dependsOn: []FieldName{"a"},
+					provides: []Field{
+						{
+							Name: "b",
+							Fill: func(index int, executionContext ExecutionContext) error {
+								return nil
+							},
+							Clear: func(d Document) {},
+						},
+					},
+				},
+			},
+			indexProvider: &indexProviderMock{
+				provides: []Index{
+					{
+						Name:  "a",
+						Clear: func(d Document) {},
+					},
+				},
+				data: &Payload{},
+			},
+			request:                            &requestMock{[]string{"a"}},
+			expectedFieldsToBeFetchedFromIndex: []string{"a"},
+			expectedNewError:                   "",
+		},
+		{
+			name: "[Success] With field providers overwritting index-provided field",
+			providers: []*fieldProviderMock{
+				{
+					name:      "a-provider",
+					dependsOn: []FieldName{"_a"},
+					provides: []Field{
+						{
+							Name: "a",
+							Fill: func(index int, executionContext ExecutionContext) error {
+								return nil
+							},
+							Clear: func(d Document) {},
+						},
+					},
+				},
+			},
+			indexProvider: &indexProviderMock{
+				provides: []Index{
+					{
+						Name:  "a",
+						Clear: func(d Document) {},
+					},
+				},
+				data: &Payload{},
+			},
+			request:                            &requestMock{[]string{"a"}},
+			expectedFieldsToBeFetchedFromIndex: []string{"a"},
+			expectedNewError:                   "",
+		},
+		{
+			name: "[Error] Dependency cicle with index provided field. DependsOn field missing underline.",
+			providers: []*fieldProviderMock{
+				{
+					name:      "a-provider",
+					dependsOn: []FieldName{"a"},
+					provides: []Field{
+						{
+							Name: "a",
+							Fill: func(index int, executionContext ExecutionContext) error {
+								return nil
+							},
+							Clear: func(d Document) {},
+						},
+					},
+				},
+			},
+			indexProvider: &indexProviderMock{
+				provides: []Index{
+					{
+						Name:  "a",
+						Clear: func(d Document) {},
+					},
+				},
+				data: &Payload{},
+			},
+			request:                            &requestMock{},
+			expectedFieldsToBeFetchedFromIndex: nil,
+			expectedNewError:                   "queryplanner.NewQueryPlanner: checkCycle: cycle found in field dependency [cycle= -> a -> a]",
 		},
 		{
 			name: "[Error] FieldProvider should implement `Fill` methods",
@@ -389,7 +479,7 @@ func TestQueryPlan_Execute(t *testing.T) {
 							Name: "a",
 							Fill: func(index int, executionContext ExecutionContext) error {
 								doc := (executionContext.Payload.Documents[index]).(*document)
-								doc.a = ref.Str("a")
+								doc.a = ref.Str("field_provider_modified_a")
 								return nil
 							},
 							Clear: func(d Document) {
@@ -410,12 +500,22 @@ func TestQueryPlan_Execute(t *testing.T) {
 						},
 					},
 				},
-				data: &Payload{},
+				data: &Payload{
+					Documents: []Document{
+						&document{
+							a: ref.Str("index-provided-a"),
+						},
+					},
+				},
 			},
 			request:                            &requestMock{[]string{"a"}},
 			expectedFieldsToBeFetchedFromIndex: []string{"a"},
 			expectedExecutionError:             "",
-			expectedDocuments:                  []*document{},
+			expectedDocuments: []*document{
+				{
+					a: ref.Str("field_provider_modified_a"),
+				},
+			},
 		},
 		{
 			name: "[Success] Force index fields",
@@ -534,7 +634,7 @@ func TestQueryPlan_Execute(t *testing.T) {
 			expectedExecutionError:             "",
 			expectedDocuments: []*document{
 				{
-					a: ref.Str("a___from_index_provider"),
+					a: ref.Str("a___from_field_provider"),
 					b: ref.Str("b___from_index_provider"),
 					c: ref.Str("c___from_field_provider"),
 					d: ref.Str("d___from_index_provider"),
