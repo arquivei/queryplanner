@@ -12,7 +12,7 @@ const (
 )
 
 // checkCycle uses a DFS algorithm to ensure that there is no cyclic
-// dependency in the field provider graph
+// dependency in the field provider graph.
 func checkCycle(fieldToProviderMap fieldProviderByName) error {
 	const op = errors.Op("checkCycle")
 	visitedNodes := map[FieldName]int{}

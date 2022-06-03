@@ -8,6 +8,7 @@ import (
 )
 
 func Test_fieldNameSet_AddAndExists(t *testing.T) {
+	t.Parallel()
 	fieldSet := newFieldNameSet(2)
 
 	field1 := FieldName("Field1")
@@ -20,6 +21,7 @@ func Test_fieldNameSet_AddAndExists(t *testing.T) {
 }
 
 func Test_fieldNameSet_Diff(t *testing.T) {
+	t.Parallel()
 	A := newFieldNameSet(0)
 	B := newFieldNameSet(0)
 
@@ -45,16 +47,17 @@ func Test_fieldNameSet_Diff(t *testing.T) {
 }
 
 func Test_fieldNameSet_Length(t *testing.T) {
+	t.Parallel()
 	A := newFieldNameSet(0)
 	assert.Equal(t, 0, A.Length())
 	for i := 0; i < 10; i++ {
 		A.Add(FieldName(fmt.Sprintf("Field %d", i)))
 		assert.Equal(t, i+1, A.Length())
-
 	}
 }
 
 func Test_fieldProviderSet_AddAndExists(t *testing.T) {
+	t.Parallel()
 	set := newFieldProviderSet(0)
 	provider1 := &fieldProviderMock{}
 	provider2 := &fieldProviderMock{}

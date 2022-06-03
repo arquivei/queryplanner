@@ -9,13 +9,13 @@ import (
 )
 
 // Plan is the product of the QueryPlanner. It can be executed, returning a
-// Payload with the enriched Document and CustomData
+// Payload with the enriched Document and CustomData.
 type Plan interface {
 	Execute(context.Context) (*Payload, error)
 }
 
 // plan implements a Plan. It can be executed using an IndexProvider and a
-// set of FieldProviders to enrich the Payload
+// set of FieldProviders to enrich the Payload.
 type plan struct {
 	fieldsToBeFetchedFromIndex fieldNameSet
 	indexProvider              IndexProvider
@@ -26,7 +26,7 @@ type plan struct {
 	processedProviders fieldProviderSet
 }
 
-// Execute runs a Plan and returns the enriched Payload
+// Execute runs a Plan and returns the enriched Payload.
 func (p plan) Execute(ctx context.Context) (*Payload, error) {
 	const op = errors.Op("queryplanner.Plan.Execute")
 
