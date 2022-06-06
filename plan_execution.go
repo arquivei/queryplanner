@@ -36,7 +36,6 @@ func (e *planExecution) clearNonRequestedFields() {
 	for _, document := range e.data.Documents {
 		e.clearNonRequestedFieldsFromDocument(document, requestedFields)
 	}
-
 }
 
 func (e *planExecution) executeProvider(ctx context.Context, provider FieldProvider) error {

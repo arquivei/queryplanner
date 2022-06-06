@@ -9,6 +9,7 @@ import (
 )
 
 func Test_cache_ExecuteOrRetrieve_CachingError(t *testing.T) {
+	t.Parallel()
 	ctx := ExecutionContext{}
 	cache := ctx.Cache()
 	calledTimes := 0
@@ -28,6 +29,7 @@ func Test_cache_ExecuteOrRetrieve_CachingError(t *testing.T) {
 }
 
 func Test_cache_ExecuteOrRetrieve_CachingResult(t *testing.T) {
+	t.Parallel()
 	ctx := ExecutionContext{}
 	cache := ctx.Cache()
 	calledTimes := 0
@@ -48,7 +50,7 @@ func Test_cache_ExecuteOrRetrieve_CachingResult(t *testing.T) {
 	}
 
 	cached, err := cache.GetOrLoad("biscoito", nil)
-	result := cached.(customStructure)
+	result, _ := cached.(customStructure)
 
 	assert.Nil(t, err)
 	assert.Equal(t, "A_1", result.A)

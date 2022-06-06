@@ -6,7 +6,7 @@ import (
 	"github.com/arquivei/foundationkit/errors"
 )
 
-// QueryPlanner is an interface that creates a Plan
+// QueryPlanner is an interface that creates a Plan.
 type QueryPlanner interface {
 	NewPlan(Request) Plan
 }
@@ -16,7 +16,7 @@ type queryPlanner struct {
 	indexProvider      IndexProvider
 }
 
-// NewQueryPlanner returns a new query planner unsing @providers
+// NewQueryPlanner returns a new query planner unsing @providers.
 func NewQueryPlanner(indexProvider IndexProvider, providers ...FieldProvider) (QueryPlanner, error) {
 	const op = errors.Op("queryplanner.NewQueryPlanner")
 

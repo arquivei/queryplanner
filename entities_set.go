@@ -1,8 +1,8 @@
 package queryplanner
 
-func newFieldNameSet(cap int) fieldNameSet {
+func newFieldNameSet(capacity int) fieldNameSet {
 	return fieldNameSet{
-		data: make(map[FieldName]struct{}, cap),
+		data: make(map[FieldName]struct{}, capacity),
 	}
 }
 
@@ -41,9 +41,9 @@ func (f *fieldNameSet) Length() int {
 	return len(f.data)
 }
 
-func newFieldProviderSet(cap int) fieldProviderSet {
+func newFieldProviderSet(capacity int) fieldProviderSet {
 	return fieldProviderSet{
-		data: make(map[FieldProvider]struct{}, cap),
+		data: make(map[FieldProvider]struct{}, capacity),
 	}
 }
 
