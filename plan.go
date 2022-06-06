@@ -43,12 +43,10 @@ func (p plan) Execute(ctx context.Context) (*Payload, error) {
 		return nil, errors.E(op, err)
 	}
 
-	filledFields := p.getRequestedFieldsFromIndex()
-
 	execution := planExecution{
 		plan:         &p,
 		data:         data,
-		filledFields: filledFields,
+		filledFields: newFieldNameSet(0),
 	}
 
 	err = execution.start(ctx)
@@ -57,16 +55,6 @@ func (p plan) Execute(ctx context.Context) (*Payload, error) {
 	}
 
 	return execution.data, nil
-}
-
-func (p plan) getRequestedFieldsFromIndex() fieldNameSet {
-	filledFields := newFieldNameSet(p.fieldsToBeFetchedFromIndex.Length())
-	for _, field := range p.indexProvider.Provides() {
-		if p.fieldsToBeFetchedFromIndex.Exists(field.Name) {
-			filledFields.Add(field.Name)
-		}
-	}
-	return filledFields
 }
 
 func (p plan) checkIfIndexHasTheNecessaryFields() error {

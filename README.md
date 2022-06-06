@@ -55,9 +55,117 @@ QueryPlanner is a generic library that aims to provide a framework for structuri
         "github.com/arquivei/queryplanner"
     )
     ```
+    
+  - Define a request struct that implements queryplanner.Request interface
+
+      ```go
+        type Request struct {
+        	Fields []string
+        }
+        
+        func (r *Request) GetRequestedFields() []string {
+        	return r.Fields
+        }
+    ```
+    
+    - This struct will be passed to all your providers and can be used to pass information such as pagination and filters.
+    
+  - Define a struct to be filled by your providers
+
+    ```go
+    type Person struct {
+    	Name      *string 
+    	FirstName *string
+    }
+    ```
+    
+  - Define a provider that implements the queryplanner.IndexProvider interface
+    
+    ```go
+    type indexProvider struct {}
+    
+    func (p *indexProvider) Provides() []queryplanner.Index {
+        return []queryplanner.Index{
+    		{
+    			Name: "Name",
+    			Clear: func(d queryplanner.Document) {
+    				doc, _ := d.(*Person)
+    				doc.Name = nil
+    			},
+    	    },
+	    }
+    }
+
+    func (p *indexProvider) Execute(ctx context.Context, request queryplanner.Request, fields []string) (*queryplanner.Payload, error) {
+        return &queryplanner.Payload{
+    		Documents: []queryplanner.Document{
+    		    &Person{
+    		        Name: "Maria Joana",
+    		    },
+    		},
+	    }, nil
+    }
+    ```
+
+    - This is the first provider to be executed and it has the responsability of setting the payload documents that will be modified by the other providers.
+    
+
+  - Define a provider that implements the queryplanner.FieldProvider interface
+    
+    ```go
+    type fieldProvider struct {}
+    
+    func (p *fieldProvider) Provides() []queryplanner.Field {
+        return []queryplanner.Field{
+    		{
+    			Name: "Name",
+    			Fill: func(index int, ec queryplanner.ExecutionContext) error {
+    			    doc := ec.Payload.Documents[i].(*Person)
+    			    doc.FirstName = strings.Split(doc.Name, " ")[0]
+    			    return nil
+    			},
+    			Clear: func(d queryplanner.Document) {
+    				doc, _ := d.(*Person)
+    				doc.Name = nil
+    			},
+    	    },
+	    }
+    }
+
+    func (p *fieldProvider) DependsOn() []queryplanner.FieldName {
+    	return []queryplanner.FieldName{
+    		"Name",
+    	}
+    }
+    ```
+
+    - The field provider must say what fields it depends on to be used and what fields it provides.
+    
+  - Finally you can create your queryplanner and make requests to it:
+
+    ```go
+    import (
+        "github.com/arquivei/queryplanner"
+    )
+    
+    func main() {
+        // Create the planner
+        planner, err := queryplanner.NewQueryPlanner(indexProvider{}, fieldProvider{})
+    	if err != nil {
+    		panic(err)
+    	}
+    	
+    	// Make requests to it
+    	payload, err := planner.Plan(Request{ 
+    	    Fields: []string{"Name", "FirstName"}
+    	}).Execute()
+    }
+    ```
 
 - ### <a name="Examples" /> Examples
-  
+
+    For more in-depth examples of how to use the library, check the examples folder.  
+
   - [Sample usage](https://github.com/arquivei/queryplanner/blob/master/examples/main.go)
 
 ## <a name="Changelog" /> 4. Changelog
