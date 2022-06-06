@@ -8,6 +8,7 @@ import (
 )
 
 func Test_fieldProviderByName_AddAndGetByName(t *testing.T) {
+	t.Parallel()
 	fp := newFieldProviderByName()
 	provider1 := &fieldProviderMock{}
 	fp.Add("Field1", provider1)
@@ -34,6 +35,7 @@ func Test_fieldProviderByName_AddAndGetByName(t *testing.T) {
 }
 
 func Test_fieldProviderByName_Length(t *testing.T) {
+	t.Parallel()
 	fp := newFieldProviderByName()
 	assert.Equal(t, 0, fp.Length())
 	for i := 1; i < 10; i++ {
@@ -43,6 +45,7 @@ func Test_fieldProviderByName_Length(t *testing.T) {
 }
 
 func Test_fieldProviderByName_GetFieldNames(t *testing.T) {
+	t.Parallel()
 	fp := newFieldProviderByName()
 	for i := 1; i < 5; i++ {
 		fp.Add(FieldName(fmt.Sprintf("Field_%d", i)), &fieldProviderMock{})

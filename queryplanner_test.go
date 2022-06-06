@@ -9,7 +9,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// nolint
 func TestQueryPlan_New(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		name                               string
 		providers                          []*fieldProviderMock
@@ -55,7 +57,8 @@ func TestQueryPlan_New(t *testing.T) {
 							Clear: func(_ Document) {},
 						},
 					},
-				}},
+				},
+			},
 			indexProvider:                      &indexProviderMock{},
 			request:                            &requestMock{[]string{}},
 			expectedFieldsToBeFetchedFromIndex: nil,
@@ -74,7 +77,8 @@ func TestQueryPlan_New(t *testing.T) {
 							Clear: nil,
 						},
 					},
-				}},
+				},
+			},
 			indexProvider:                      &indexProviderMock{},
 			request:                            &requestMock{[]string{}},
 			expectedFieldsToBeFetchedFromIndex: nil,
@@ -223,7 +227,9 @@ func TestQueryPlan_New(t *testing.T) {
 	}
 }
 
+// nolint:forcetypeassert
 func TestQueryPlan_Execute_DependecyChain(t *testing.T) {
+	t.Parallel()
 	providerA := fieldProviderMock{
 		name:      "a-provider",
 		dependsOn: []FieldName{"b"},
@@ -367,6 +373,7 @@ func TestQueryPlan_Execute_DependecyChain(t *testing.T) {
 	assert.EqualValues(t, expectedDocuments, documents)
 }
 
+// nolint
 func TestQueryPlan_Execute(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
@@ -594,9 +601,10 @@ func TestQueryPlan_Execute(t *testing.T) {
 				},
 				data: &Payload{
 					Documents: func() []Document {
-						docs := []*document{{
-							a: ref.Str("a___from_index_provider"),
-						},
+						docs := []*document{
+							{
+								a: ref.Str("a___from_index_provider"),
+							},
 						}
 						return wrapDocuments(docs)
 					}(),
@@ -913,6 +921,7 @@ func (d *document) GetDocument() interface{} {
 	return d
 }
 
+// nolint
 func unwrapDocuments(documents []Document) []*document {
 	docs := make([]*document, 0, len(documents))
 	for _, doc := range documents {

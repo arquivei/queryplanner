@@ -10,11 +10,11 @@ type Request interface {
 	GetRequestedFields() []string
 }
 
-// Document is an interface that represents a generic data structure
+// Document is an interface that represents a generic data structure.
 type Document interface{}
 
 // Field represents a valid field. It has a name and
-// functions for filling and cleaning itself
+// functions for filling and cleaning itself.
 type Field struct {
 	Name  FieldName
 	Fill  func(int, ExecutionContext) error
@@ -22,14 +22,14 @@ type Field struct {
 }
 
 // Index represents a valid index. It has a name and
-// functions for cleaning itself
+// functions for cleaning itself.
 type Index struct {
 	Name  FieldName
 	Clear func(Document)
 }
 
 // ExecutionContext is used during the filling process. It stores essential
-// data structures to executing the enrichment processes
+// data structures to executing the enrichment processes.
 type ExecutionContext struct {
 	Context context.Context
 	Request Request
@@ -37,7 +37,7 @@ type ExecutionContext struct {
 	Payload *Payload
 }
 
-// Cache instatiates a new Cache
+// Cache instatiates a new Cache.
 func (e *ExecutionContext) Cache() *Cache {
 	if e.cache == nil {
 		e.cache = newCache()
@@ -49,10 +49,10 @@ func newCache() *Cache {
 	return &Cache{cache: make(map[interface{}]*CacheEntry)}
 }
 
-// CacheEntryLoader is a function that caches the result of the first call of function
+// CacheEntryLoader is a function that caches the result of the first call of function.
 type CacheEntryLoader func() (interface{}, error)
 
-// Cache caches the result of a function
+// Cache caches the result of a function.
 type Cache struct {
 	cache map[interface{}]*CacheEntry
 }
@@ -73,18 +73,18 @@ func (c *Cache) GetOrLoad(key interface{}, loader CacheEntryLoader) (interface{}
 	return data, err
 }
 
-// CacheEntry is the stored element in Cache
+// CacheEntry is the stored element in Cache.
 type CacheEntry struct {
 	data interface{}
 	err  error
 }
 
 // Payload stores the slice of documents and also supports an arbitrary data
-// to be used when necessary
+// to be used when necessary.
 type Payload struct {
 	Documents  []Document
 	CustomData interface{}
 }
 
-// FieldName is a string representing a valid field
+// FieldName is a string representing a valid field.
 type FieldName string
