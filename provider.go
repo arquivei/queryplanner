@@ -15,7 +15,7 @@ type FieldProvider interface {
 // populating them. However, the IndexProvider should not depend on anyone else,
 // as FieldProvider does.  Also, an IndexProvider has an additional responsibility:
 // to create the initial base of documents (encapsulated inside Payload) to be enriched
-// by the FieldProviders
+// by the FieldProviders.
 type IndexProvider interface {
 	Execute(ctx context.Context, request Request, fields []string) (*Payload, error)
 	Provides() []Index
