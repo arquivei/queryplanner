@@ -1,6 +1,6 @@
 module github.com/arquivei/queryplanner
 
-go 1.18
+go 1.19
 
 require (
 	github.com/arquivei/foundationkit v0.2.9
