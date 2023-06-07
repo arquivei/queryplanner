@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// nolint
+//nolint
 func TestQueryPlan_New(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
@@ -317,7 +317,7 @@ func TestQueryPlan_New(t *testing.T) {
 	}
 }
 
-// nolint:forcetypeassert
+//nolint:forcetypeassert
 func TestQueryPlan_Execute_DependecyChain(t *testing.T) {
 	t.Parallel()
 	providerA := fieldProviderMock{
@@ -463,7 +463,7 @@ func TestQueryPlan_Execute_DependecyChain(t *testing.T) {
 	assert.EqualValues(t, expectedDocuments, documents)
 }
 
-// nolint
+//nolint
 func TestQueryPlan_Execute(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
@@ -1021,7 +1021,7 @@ func (d *document) GetDocument() interface{} {
 	return d
 }
 
-// nolint
+//nolint
 func unwrapDocuments(documents []Document) []*document {
 	docs := make([]*document, 0, len(documents))
 	for _, doc := range documents {
