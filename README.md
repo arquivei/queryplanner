@@ -24,14 +24,14 @@ QueryPlanner is a generic library that aims to provide a framework for structuri
 
 | **Stack**     | **Version** |
 |---------------|-------------|
-| Golang        | v1.18       |
+| Golang        | v1.21       |
 | golangci-lint | v1.46.2     |
 
 ## <a name="GettingStarted" /> 3. Getting Started
 
 - ### <a name="Prerequisites" /> Prerequisites
 
-  - Any [Golang](https://go.dev/doc/install) programming language version installed, preferred 1.18 or later.
+  - Any [Golang](https://go.dev/doc/install) programming language version installed, preferred 1.21 or later.
 
 - ### <a name="Install" /> Install
   
