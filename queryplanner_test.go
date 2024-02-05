@@ -9,20 +9,20 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-//nolint
+// nolint
 func TestQueryPlan_New(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name                               string
-		providers                          []*fieldProviderMock
-		indexProvider                      *indexProviderMock
-		request                            *requestMock
+		providers                          []FieldProvider
+		indexProvider                      IndexProvider
+		request                            Request
 		expectedFieldsToBeFetchedFromIndex []string
 		expectedNewError                   string
 	}{
 		{
 			name:      "[Success] empty - no Field providers",
-			providers: []*fieldProviderMock{},
+			providers: []FieldProvider{},
 			indexProvider: &indexProviderMock{
 				provides: []Index{
 					{
@@ -46,8 +46,8 @@ func TestQueryPlan_New(t *testing.T) {
 		},
 		{
 			name: "[Success] With field providers",
-			providers: []*fieldProviderMock{
-				{
+			providers: []FieldProvider{
+				&fieldProviderMock{
 					name:      "b-provider",
 					dependsOn: []FieldName{"a"},
 					provides: []Field{
@@ -76,8 +76,8 @@ func TestQueryPlan_New(t *testing.T) {
 		},
 		{
 			name: "[Success] With field providers overwritting index-provided field",
-			providers: []*fieldProviderMock{
-				{
+			providers: []FieldProvider{
+				&fieldProviderMock{
 					name:      "a-provider",
 					dependsOn: []FieldName{"_a"},
 					provides: []Field{
@@ -106,8 +106,8 @@ func TestQueryPlan_New(t *testing.T) {
 		},
 		{
 			name: "[Error] Dependency cicle with index provided field. DependsOn field missing underline.",
-			providers: []*fieldProviderMock{
-				{
+			providers: []FieldProvider{
+				&fieldProviderMock{
 					name:      "a-provider",
 					dependsOn: []FieldName{"a"},
 					provides: []Field{
@@ -136,8 +136,8 @@ func TestQueryPlan_New(t *testing.T) {
 		},
 		{
 			name: "[Error] FieldProvider should implement `Fill` methods",
-			providers: []*fieldProviderMock{
-				{
+			providers: []FieldProvider{
+				&fieldProviderMock{
 					name:      "a-provider",
 					dependsOn: []FieldName{"b"},
 					provides: []Field{
@@ -156,8 +156,8 @@ func TestQueryPlan_New(t *testing.T) {
 		},
 		{
 			name: "[Error] FieldProvider should implement `Clear` methods",
-			providers: []*fieldProviderMock{
-				{
+			providers: []FieldProvider{
+				&fieldProviderMock{
 					name:      "a-provider",
 					dependsOn: []FieldName{"b"},
 					provides: []Field{
@@ -176,7 +176,7 @@ func TestQueryPlan_New(t *testing.T) {
 		},
 		{
 			name:      "[Error] IndexProvider should implement `Clear` methods",
-			providers: []*fieldProviderMock{},
+			providers: []FieldProvider{},
 			indexProvider: &indexProviderMock{
 				provides: []Index{
 					{
@@ -189,16 +189,24 @@ func TestQueryPlan_New(t *testing.T) {
 			expectedNewError:                   "queryplanner.NewQueryPlanner: checkIfIndexProviderIsDeclaredCorrectly: fieldprovider has no `clear` method defined [fieldName=a]",
 		},
 		{
-			name:                               "[Error]  We should provide an IndexProvider",
-			providers:                          []*fieldProviderMock{},
+			name:                               "[Error]  We should provide an IndexProvider - not initialized",
+			providers:                          []FieldProvider{},
 			indexProvider:                      nil,
 			request:                            &requestMock{[]string{}},
 			expectedFieldsToBeFetchedFromIndex: nil,
 			expectedNewError:                   "queryplanner.NewQueryPlanner: checkIfIndexProviderIsDeclaredCorrectly: indexProvider should not be nil",
 		},
 		{
-			name: "[Error] FieldProvider should not be nil",
-			providers: []*fieldProviderMock{
+			name:                               "[Error]  We should provide an IndexProvider - initialized",
+			providers:                          []FieldProvider{},
+			indexProvider:                      func() *indexProviderMock { return nil }(),
+			request:                            &requestMock{[]string{}},
+			expectedFieldsToBeFetchedFromIndex: nil,
+			expectedNewError:                   "queryplanner.NewQueryPlanner: checkIfIndexProviderIsDeclaredCorrectly: indexProvider should not be nil",
+		},
+		{
+			name: "[Error] FieldProvider should not be nil - not initialized",
+			providers: []FieldProvider{
 				nil, nil,
 			},
 			indexProvider: &indexProviderMock{
@@ -215,9 +223,28 @@ func TestQueryPlan_New(t *testing.T) {
 			expectedNewError:                   "queryplanner.NewQueryPlanner: checkIfFieldProvidersAreDeclaredCorrectly: fieldprovider should not be nil",
 		},
 		{
+			name: "[Error] FieldProvider should not be nil - initialized",
+			providers: []FieldProvider{
+				func() *fieldProviderMock { return nil }(),
+				func() *fieldProviderMock { return nil }(),
+			},
+			indexProvider: &indexProviderMock{
+				provides: []Index{
+					{
+						Name:  "a",
+						Clear: func(d Document) {},
+					},
+				},
+				data: &Payload{},
+			},
+			request:                            &requestMock{[]string{"a"}},
+			expectedFieldsToBeFetchedFromIndex: []string{"a"},
+			expectedNewError:                   "queryplanner.NewQueryPlanner: checkIfFieldProvidersAreDeclaredCorrectly: fieldprovider should not be nil",
+		},
+		{
 			name: "[Error] Dependency cycle",
-			providers: []*fieldProviderMock{
-				{
+			providers: []FieldProvider{
+				&fieldProviderMock{
 					name:      "a-provider",
 					dependsOn: []FieldName{"b"},
 					provides: []Field{
@@ -228,7 +255,7 @@ func TestQueryPlan_New(t *testing.T) {
 						},
 					},
 				},
-				{
+				&fieldProviderMock{
 					name:      "b-provider",
 					dependsOn: []FieldName{"c"},
 					provides: []Field{
@@ -239,7 +266,7 @@ func TestQueryPlan_New(t *testing.T) {
 						},
 					},
 				},
-				{
+				&fieldProviderMock{
 					name:      "c-provider",
 					dependsOn: []FieldName{"a"},
 					provides: []Field{
@@ -263,8 +290,8 @@ func TestQueryPlan_New(t *testing.T) {
 		},
 		{
 			name: "[Error] Multiple FieldProviders for same Field",
-			providers: []*fieldProviderMock{
-				{
+			providers: []FieldProvider{
+				&fieldProviderMock{
 					name:      "a-provider",
 					dependsOn: []FieldName{"b"},
 					provides: []Field{
@@ -275,7 +302,7 @@ func TestQueryPlan_New(t *testing.T) {
 						},
 					},
 				},
-				{
+				&fieldProviderMock{
 					name:      "a-provider-2",
 					dependsOn: []FieldName{"c"},
 					provides: []Field{
@@ -300,11 +327,7 @@ func TestQueryPlan_New(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			providers := make([]FieldProvider, 0, len(test.providers))
-			for _, p := range test.providers {
-				providers = append(providers, p)
-			}
-			planner, err := NewQueryPlanner(test.indexProvider, providers...)
+			planner, err := NewQueryPlanner(test.indexProvider, test.providers...)
 
 			if test.expectedNewError != "" {
 				assert.EqualError(t, err, test.expectedNewError)
@@ -463,7 +486,7 @@ func TestQueryPlan_Execute_DependecyChain(t *testing.T) {
 	assert.EqualValues(t, expectedDocuments, documents)
 }
 
-//nolint
+// nolint
 func TestQueryPlan_Execute(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
@@ -1021,7 +1044,7 @@ func (d *document) GetDocument() interface{} {
 	return d
 }
 
-//nolint
+// nolint
 func unwrapDocuments(documents []Document) []*document {
 	docs := make([]*document, 0, len(documents))
 	for _, doc := range documents {
