@@ -94,7 +94,7 @@ func (q *queryPlanner) registerProvider(provider FieldProvider) error {
 
 func checkIfIndexProviderIsDeclaredCorrectly(indexProvider IndexProvider) error {
 	const op = errors.Op("checkIfIndexProviderIsDeclaredCorrectly")
-	if reflect.ValueOf(indexProvider).IsNil() {
+	if indexProvider == nil || reflect.ValueOf(indexProvider).IsNil() {
 		return errors.E(op, "indexProvider should not be nil")
 	}
 	for _, field := range indexProvider.Provides() {
@@ -109,7 +109,7 @@ func checkIfFieldProvidersAreDeclaredCorrectly(providers []FieldProvider) error 
 	const op = errors.Op("checkIfFieldProvidersAreDeclaredCorrectly")
 
 	for _, fieldProvider := range providers {
-		if reflect.ValueOf(fieldProvider).IsNil() {
+		if fieldProvider == nil || reflect.ValueOf(fieldProvider).IsNil() {
 			return errors.E(op, "fieldprovider should not be nil")
 		}
 		err := checkMethodsFromFieldProvider(fieldProvider)
