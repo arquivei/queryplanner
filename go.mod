@@ -6,7 +6,7 @@ toolchain go1.21.3
 
 require (
 	github.com/arquivei/foundationkit v0.6.1
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 )
 
 require (
