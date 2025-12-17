@@ -351,7 +351,7 @@ func TestQueryPlan_Execute_DependecyChain(t *testing.T) {
 				Name: "a",
 				Fill: func(index int, executionContext ExecutionContext) error {
 					doc := (executionContext.Payload.Documents[index]).(*document)
-					doc.a = ref.Str("a")
+					doc.a = ref.Of("a")
 
 					customPayload := (executionContext.Payload.CustomData).(*payload)
 					customPayload.calledProviders = append(customPayload.calledProviders, "a-provider")
@@ -373,7 +373,7 @@ func TestQueryPlan_Execute_DependecyChain(t *testing.T) {
 				Name: "b",
 				Fill: func(index int, executionContext ExecutionContext) error {
 					doc := (executionContext.Payload.Documents[index]).(*document)
-					doc.b = ref.Str("b")
+					doc.b = ref.Of("b")
 
 					customPayload := (executionContext.Payload.CustomData).(*payload)
 					customPayload.calledProviders = append(customPayload.calledProviders, "b-provider")
@@ -395,7 +395,7 @@ func TestQueryPlan_Execute_DependecyChain(t *testing.T) {
 				Name: "c",
 				Fill: func(index int, executionContext ExecutionContext) error {
 					doc := (executionContext.Payload.Documents[index]).(*document)
-					doc.c = ref.Str("c")
+					doc.c = ref.Of("c")
 
 					customPayload := (executionContext.Payload.CustomData).(*payload)
 					customPayload.calledProviders = append(customPayload.calledProviders, "c-provider")
@@ -436,9 +436,9 @@ func TestQueryPlan_Execute_DependecyChain(t *testing.T) {
 		data: &Payload{
 			Documents: func() []Document {
 				docs := []*document{
-					{d: ref.Str("d1"), e: ref.Str("e1"), f: ref.Str("f1")},
-					{d: ref.Str("d2"), e: ref.Str("e2"), f: ref.Str("f2")},
-					{d: ref.Str("d3"), e: ref.Str("e3"), f: ref.Str("f3")},
+					{d: ref.Of("d1"), e: ref.Of("e1"), f: ref.Of("f1")},
+					{d: ref.Of("d2"), e: ref.Of("e2"), f: ref.Of("f2")},
+					{d: ref.Of("d3"), e: ref.Of("e3"), f: ref.Of("f3")},
 				}
 				return wrapDocuments(docs)
 			}(),
@@ -471,16 +471,16 @@ func TestQueryPlan_Execute_DependecyChain(t *testing.T) {
 	documents := unwrapDocuments(data.Documents)
 	expectedDocuments := []*document{
 		{
-			a: ref.Str("a"),
-			f: ref.Str("f1"),
+			a: ref.Of("a"),
+			f: ref.Of("f1"),
 		},
 		{
-			a: ref.Str("a"),
-			f: ref.Str("f2"),
+			a: ref.Of("a"),
+			f: ref.Of("f2"),
 		},
 		{
-			a: ref.Str("a"),
-			f: ref.Str("f3"),
+			a: ref.Of("a"),
+			f: ref.Of("f3"),
 		},
 	}
 	assert.EqualValues(t, expectedDocuments, documents)
@@ -509,7 +509,7 @@ func TestQueryPlan_Execute(t *testing.T) {
 							Name: "a",
 							Fill: func(index int, executionContext ExecutionContext) error {
 								doc := (executionContext.Payload.Documents[index]).(*document)
-								doc.a = ref.Str("field_provider_modified_a")
+								doc.a = ref.Of("field_provider_modified_a")
 								return nil
 							},
 							Clear: func(d Document) {
@@ -533,7 +533,7 @@ func TestQueryPlan_Execute(t *testing.T) {
 				data: &Payload{
 					Documents: []Document{
 						&document{
-							a: ref.Str("index-provided-a"),
+							a: ref.Of("index-provided-a"),
 						},
 					},
 				},
@@ -543,7 +543,7 @@ func TestQueryPlan_Execute(t *testing.T) {
 			expectedExecutionError:             "",
 			expectedDocuments: []*document{
 				{
-					a: ref.Str("field_provider_modified_a"),
+					a: ref.Of("field_provider_modified_a"),
 				},
 			},
 		},
@@ -558,7 +558,7 @@ func TestQueryPlan_Execute(t *testing.T) {
 							Name: "a",
 							Fill: func(index int, executionContext ExecutionContext) error {
 								doc := (executionContext.Payload.Documents[index]).(*document)
-								doc.a = ref.Str("a___from_field_provider")
+								doc.a = ref.Of("a___from_field_provider")
 								return nil
 							},
 							Clear: func(d Document) {
@@ -576,7 +576,7 @@ func TestQueryPlan_Execute(t *testing.T) {
 							Name: "c",
 							Fill: func(index int, executionContext ExecutionContext) error {
 								doc := (executionContext.Payload.Documents[index]).(*document)
-								doc.c = ref.Str("c___from_field_provider")
+								doc.c = ref.Of("c___from_field_provider")
 								return nil
 							},
 							Clear: func(d Document) {
@@ -594,7 +594,7 @@ func TestQueryPlan_Execute(t *testing.T) {
 							Name: "e",
 							Fill: func(index int, executionContext ExecutionContext) error {
 								doc := (executionContext.Payload.Documents[index]).(*document)
-								doc.e = ref.Str("e___from_field_provider")
+								doc.e = ref.Of("e___from_field_provider")
 								return nil
 							},
 							Clear: func(d Document) {
@@ -647,11 +647,11 @@ func TestQueryPlan_Execute(t *testing.T) {
 					Documents: func() []Document {
 						docs := []*document{
 							{
-								a: ref.Str("a___from_index_provider"),
-								b: ref.Str("b___from_index_provider"),
-								c: ref.Str("c___from_index_provider"),
-								d: ref.Str("d___from_index_provider"),
-								e: ref.Str("e___from_index_provider"),
+								a: ref.Of("a___from_index_provider"),
+								b: ref.Of("b___from_index_provider"),
+								c: ref.Of("c___from_index_provider"),
+								d: ref.Of("d___from_index_provider"),
+								e: ref.Of("e___from_index_provider"),
 							},
 						}
 						return wrapDocuments(docs)
@@ -664,10 +664,10 @@ func TestQueryPlan_Execute(t *testing.T) {
 			expectedExecutionError:             "",
 			expectedDocuments: []*document{
 				{
-					a: ref.Str("a___from_field_provider"),
-					b: ref.Str("b___from_index_provider"),
-					c: ref.Str("c___from_field_provider"),
-					d: ref.Str("d___from_index_provider"),
+					a: ref.Of("a___from_field_provider"),
+					b: ref.Of("b___from_index_provider"),
+					c: ref.Of("c___from_field_provider"),
+					d: ref.Of("d___from_index_provider"),
 					e: nil,
 				},
 			},
@@ -683,7 +683,7 @@ func TestQueryPlan_Execute(t *testing.T) {
 							Name: "a",
 							Fill: func(index int, executionContext ExecutionContext) error {
 								doc := (executionContext.Payload.Documents[index]).(*document)
-								doc.a = ref.Str("a")
+								doc.a = ref.Of("a")
 								return nil
 							},
 							Clear: func(d Document) {
@@ -701,7 +701,7 @@ func TestQueryPlan_Execute(t *testing.T) {
 							Name: "b",
 							Fill: func(index int, executionContext ExecutionContext) error {
 								doc := (executionContext.Payload.Documents[index]).(*document)
-								doc.b = ref.Str("b")
+								doc.b = ref.Of("b")
 								return errors.E("problem filling b")
 							},
 							Clear: func(d Document) {
@@ -726,7 +726,7 @@ func TestQueryPlan_Execute(t *testing.T) {
 					Documents: func() []Document {
 						docs := []*document{
 							{
-								a: ref.Str("a___from_index_provider"),
+								a: ref.Of("a___from_index_provider"),
 							},
 						}
 						return wrapDocuments(docs)
@@ -787,7 +787,7 @@ func TestQueryPlan_Execute(t *testing.T) {
 							Name: "a",
 							Fill: func(index int, executionContext ExecutionContext) error {
 								doc := (executionContext.Payload.Documents[index]).(*document)
-								doc.a = ref.Str("a")
+								doc.a = ref.Of("a")
 								return nil
 							},
 							Clear: func(d Document) {
@@ -868,15 +868,15 @@ func TestQueryPlan_Execute(t *testing.T) {
 					Documents: func() []Document {
 						docs := []*document{
 							{
-								a: ref.Str("a"),
-								b: ref.Str("b"),
-								c: ref.Str("c"),
-								d: ref.Str("d"),
-								e: ref.Str("e"),
-								f: ref.Str("f"),
-								g: ref.Str("g"),
-								h: ref.Str("h"),
-								i: ref.Str("i"),
+								a: ref.Of("a"),
+								b: ref.Of("b"),
+								c: ref.Of("c"),
+								d: ref.Of("d"),
+								e: ref.Of("e"),
+								f: ref.Of("f"),
+								g: ref.Of("g"),
+								h: ref.Of("h"),
+								i: ref.Of("i"),
 							},
 						}
 						return wrapDocuments(docs)
@@ -889,9 +889,9 @@ func TestQueryPlan_Execute(t *testing.T) {
 			expectedExecutionError:             "",
 			expectedDocuments: []*document{
 				{
-					a: ref.Str("a"),
-					d: ref.Str("d"),
-					i: ref.Str("i"),
+					a: ref.Of("a"),
+					d: ref.Of("d"),
+					i: ref.Of("i"),
 				},
 			},
 		},
@@ -907,8 +907,8 @@ func TestQueryPlan_Execute(t *testing.T) {
 								doc := (executionContext.Payload.Documents[index]).(*document)
 								docFromCache, _ := executionContext.Cache().GetOrLoad("ab", func() (interface{}, error) {
 									return document{
-										a: ref.Str("a"),
-										b: ref.Str("b"),
+										a: ref.Of("a"),
+										b: ref.Of("b"),
 									}, nil
 								})
 								doc.a = docFromCache.(document).a
@@ -925,7 +925,7 @@ func TestQueryPlan_Execute(t *testing.T) {
 								doc := (executionContext.Payload.Documents[index]).(*document)
 								docFromCache, _ := executionContext.Cache().GetOrLoad("ab", func() (interface{}, error) {
 									return document{
-										b: ref.Str("should use cached value from previous field"),
+										b: ref.Of("should use cached value from previous field"),
 									}, nil
 								})
 								doc.b = docFromCache.(document).b
@@ -951,8 +951,8 @@ func TestQueryPlan_Execute(t *testing.T) {
 			expectedExecutionError:             "",
 			expectedDocuments: []*document{
 				{
-					a: ref.Str("a"),
-					b: ref.Str("b"),
+					a: ref.Of("a"),
+					b: ref.Of("b"),
 				},
 			},
 		},
@@ -967,7 +967,7 @@ func TestQueryPlan_Execute(t *testing.T) {
 							Name: "a",
 							Fill: func(index int, executionContext ExecutionContext) error {
 								doc := (executionContext.Payload.Documents[index]).(*document)
-								doc.a = ref.Str("a")
+								doc.a = ref.Of("a")
 								return nil
 							},
 							Clear: func(d Document) {
