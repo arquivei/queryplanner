@@ -3,7 +3,7 @@ module github.com/arquivei/queryplanner
 go 1.27
 
 require (
-	github.com/arquivei/foundationkit v0.14.0
+	github.com/arquivei/foundationkit v0.14.1
 	github.com/stretchr/testify v1.12.1
 )
 
