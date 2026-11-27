@@ -3,7 +3,7 @@ module github.com/arquivei/queryplanner
 go 1.27
 
 require (
-	github.com/arquivei/foundationkit v0.14.1
+	github.com/arquivei/foundationkit v0.14.2
 	github.com/stretchr/testify v1.12.1
 )
 
@@ -33,7 +33,7 @@ require (
 	go.opentelemetry.io/proto/otlp v1.11.1 // indirect
 	go.yaml.in/yaml/v3 v3.0.6 // indirect
 	golang.org/x/net v0.62.0 // indirect
-	golang.org/x/oauth2 v0.37.0 // indirect
+	golang.org/x/oauth2 v0.38.0 // indirect
 	golang.org/x/sys v0.49.0 // indirect
 	golang.org/x/text v0.43.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20261104224025-d1e00e9f33ab // indirect
